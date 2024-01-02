@@ -4,7 +4,9 @@ This Blazor Server app is a basic structure for creating a location-based (NFC /
 
 ## Setup
 
-Fork the repo then init user-secrets.  You will need to set a valid MSSQL connection string like:
+Fork the repo then init user-secrets.  We just need one for the DB conn string currently so set it at `"ConnectionStrings:DefaultConnection"`
+
+You will need to set a valid MSSQL connection string like:
 
 ```"Data Source=URL;Initial Catalog=DATABASE;User Id=USERID;Password=PASSWORD"```
 
