@@ -1,4 +1,4 @@
-# goldie
+# Goldie
 
 This Blazor Server app is a basic structure for creating a location-based (NFC /QR tags) trivia game.  Modeled after the "Re-elect Goldie Wilson" posters from the Back to the Future movie series, this game requires a MSSQL database to store a set of questions.  Players scan the NFC or QR code then are prompted to set a player name. After that they receive questions as the interact with the tags.  An Admin screen lets the host monitor progress and review questions.
 
@@ -21,3 +21,16 @@ Once you have a healthy set of questions you can start encoding your tags!
 Out-of-the-box, the Admin page lives at WEBSITE/admin/88 - you know, because that's how fast the DeLorean needed to go!  Change the route by modifying the `@page` directive at the top of the Admin.razor file.
 
 The Admin page lists the current players scores, sorted by Score value then by Time Completed.  There is also a toggle for showing/hiding the games Questions.
+
+## Notes 
+- When using NFC tags, iPhone users may have to setup an "Automation" by using the Shorcuts app.  This slowed down adoption briefly but it was a one-time task so not too painful.
+- The cookie expiration may complicate game play if the trivia game lasts more than a day, if so change that in the WriteCookie method.
+- If a player switches browsers, they will be prompted to create a new player (name). That may trip people up since there is no name validation or player merging.
+
+## Potential Improvements
+- Add db-functions to admin page like clear Answers / Players
+- SignalR messaging to create urgency and fun by notifying others when players complete questions or the game
+- Improved scoring system
+- Allow hints for players
+- Add images or text after answering to add context
+- Alternate question types beyond multiple choice
