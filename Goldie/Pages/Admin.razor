@@ -1,0 +1,104 @@
+﻿@page "/admin/88"
+@using Goldie.Data;
+@using Goldie.Services;
+@inject IJSRuntime JsRuntime;
+@inject NavigationManager NavManager
+@inject PlayerService PlayerService
+@inject QuestionService QuestionService
+
+
+@if (Scores != null)
+{
+    <h3>Scores</h3>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Score</th>
+                <th>Answers</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var s in Scores.OrderByDescending(x => x.Score).ThenByDescending(x => x.TimeCompleted))
+    {
+        <tr>
+            <td>@s.Name</td>
+            <td>@s.Score</td>
+            <td><span class="text-muted">@s.Answers</span></td>                    
+            <td>
+               @if(s.TimeCompleted.Year != 1) {
+                    @s.TimeCompleted.ToString("hh:mm:ss tt");
+                }
+                else
+                {
+                    <text>-</text>
+                }
+            </td>
+        </tr>
+    }
+        </tbody>
+    </table>
+    <br />
+    <hr />
+    <br />
+}
+
+@if (Questions != null && ShowQuestions)
+{
+    <h3>Questions</h3>
+
+    @foreach (var q in Questions)
+    {
+        <p>@q.QuestionText <span class="text-muted">@q.CorrectChoice</span>
+            <br />
+            <small>goldie.blazorgames.com/poster/@q.QuestionToken</small>
+        </p>
+    }
+}
+
+@if (!ShowQuestions)
+{
+    <div class="row">
+        <div class="col">
+            <button type="button" class="btn btn-primary w-100" @onclick="@ShowQuestionsClick">Show Questions</button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <button type="button" class="btn btn-secondary w-100" @onclick="@HideQuestionsClick">Hide Questions</button>
+        </div>
+    </div>
+}
+
+
+@code {
+    public List<Question> Questions { get; set;  }
+
+    public List<PlayerScore> Scores { get; set; }
+
+    public bool ShowQuestions { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Questions = await QuestionService.GetAllQuestionAsync();
+
+        Scores = await PlayerService.GetAllPlayerScoresAsync();
+    }
+
+    public void ShowQuestionsClick()
+    {
+        ShowQuestions = true;
+        StateHasChanged();
+    }
+    
+    public void HideQuestionsClick()
+    {
+        ShowQuestions = false;
+        StateHasChanged();
+    }
+}
