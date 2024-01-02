@@ -18,6 +18,12 @@ If it all works as planned, you will have tables for Migrations, Players, Questi
 
 Once you have a healthy set of questions you can start encoding your tags!
 
+## Poster.razor
+
+This file has some of the game logic as it was initially built with NFC tags hidden behind posters like this:
+
+![Goldie Wilson poster](https://github.com/shanabus/goldie/blob/main/Goldie/wwwroot/images/goldie-wilson.png?raw=true)
+
 ## Admin
 
 Out-of-the-box, the Admin page lives at WEBSITE/admin/88 - you know, because that's how fast the DeLorean needed to go!  Change the route by modifying the `@page` directive at the top of the Admin.razor file.
