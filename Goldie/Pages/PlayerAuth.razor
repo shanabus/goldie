@@ -1,0 +1,21 @@
+﻿@using Goldie.Data;
+
+@if(Player != null)
+{
+    <div class="d-flex justify-content-between">@Player.Name <span class="text-muted">(@Player.Answers.Count() of 14 answered)</span></div>
+}
+
+<hr />
+
+@code {
+    [Parameter]
+    public string QuestionToken { get; set; } = string.Empty;
+
+    [Parameter]
+    public Player Player { get; set; } = new Player();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}

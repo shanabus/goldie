@@ -1,0 +1,76 @@
+﻿@page "/submitted"
+@using Goldie.Data;
+@using Goldie.Services;
+@inject IJSRuntime JsRuntime;
+@inject NavigationManager NavManager
+@inject AnswerService AnswerService
+@inject PlayerService PlayerService
+@inject QuestionService QuestionService
+
+<PlayerAuth Player="@Player"></PlayerAuth>
+
+@if(Player != null)
+{
+    <h3>Your Score: @Score</h3>
+}
+
+@if(Player != null && Player.Answers.Count() == 14)
+{
+    <div class="alert alert-success">
+        <p>Congratulations, you have answered all the questions. </p>
+        <p>Winners will be announced after lightning strikes the Clock Tower!</p>
+    </div>
+} 
+else
+{
+    <p>More posters means more trivia!</p>    
+}
+
+@code {
+
+    public Player? Player { get; set; }
+
+    public List<Question> Questions { get; set; }
+
+    public int Score { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var value = await ReadCookies();
+
+            if (int.TryParse(value, out int playerId))
+            {
+                Player = await PlayerService.GetPlayerById(playerId);
+
+                Score = await PlayerService.GetPlayerScoreAsync(playerId);
+
+                // complete game for user
+                if (Player != null && Player.Answers.Count == 14)
+                {
+                    var dt = await PlayerService.PlayerHasFinishedAsync(playerId);
+                }
+
+                StateHasChanged();
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                NavManager.NavigateTo($"/Error");
+            }
+        }
+    }
+
+    protected async Task<string> ReadCookies()
+    {
+
+        return await JsRuntime.InvokeAsync<string>("ReadCookie.ReadCookie", "playerId");
+
+    }
+}

@@ -1,0 +1,114 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.WebUtilities;
+@using Goldie.Services;
+@inject IJSRuntime JsRuntime;
+@inject NavigationManager NavManager
+@inject PlayerService PlayerService
+
+<PageTitle>Welcome to Goldies</PageTitle>
+
+
+@if (FormSubmitted)
+{
+    <Loading></Loading>    
+}
+else if(!string.IsNullOrEmpty(QuestionToken))
+{
+    <h2>
+        Goldie has a questions for you. But first, you need a name:
+    </h2>
+
+    <EditForm Model="@Model" OnValidSubmit="@Submit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="col">
+            <div class="mb-2">
+                <label for="Name" class="form-label">Name</label>
+                <InputText @bind-Value="Model.Name" class="form-control" id="Name" />
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col mb-3 text-end">
+                <input type="submit" class="btn btn-success w-100" value="Submit" />
+            </div>
+        </div>
+
+    </EditForm>
+}
+else if (Model != null)
+{
+    <h2>Goldie needs your help, locate all the posters <strong>@Model.Name</strong></h2>
+}
+
+@code
+{
+    public string QuestionToken { get; set; } = string.Empty;
+
+    public NewPlayer Model { get; set; }
+
+    public bool FormSubmitted { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Model = new NewPlayer();
+
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qt", out var questionToken))
+        {
+            QuestionToken = questionToken;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var name = await ReadCookies();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                Model.Name = name;
+
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task Submit()
+    {
+        FormSubmitted = true;
+        StateHasChanged();
+
+        // log user
+        var player = await PlayerService.SavePlayerAsync(Model.Name);
+
+        // set cookie
+        await WriteCookies("playerId", player.PlayerId.ToString());
+        await WriteCookies("playerName", player.Name);
+
+        // redirect to question
+        if (!string.IsNullOrEmpty(QuestionToken))
+        {
+            NavManager.NavigateTo($"/poster/{QuestionToken}");            
+        }
+    }
+
+    protected async Task WriteCookies(string cookieName, string value)
+    {
+        await JsRuntime.InvokeAsync<object>("WriteCookie.WriteCookie", cookieName, value, 2);
+    }
+
+    protected async Task<string> ReadCookies()
+    {
+        return await JsRuntime.InvokeAsync<string>("ReadCookie.ReadCookie", "playerName");
+    }
+
+    public class NewPlayer
+    {
+        public string Name { get; set; } = string.Empty;
+    }
+}
+
+
